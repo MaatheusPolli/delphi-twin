@@ -1,0 +1,21 @@
+{
+  "id": "arredondamento-limite",
+  "descricao": "Caso de borda de arredondamento: BC x aliquota resulta em valor exatamente no meio do centavo (4.995), deve usar ROUND_HALF_EVEN e concordar entre Currency (Delphi) e decimal.js (TS).",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "SP",
+    "destinatarioContribuinte": true,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "100.00",
+      "quantidade": "1",
+      "frete": "0.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": { "aliquota": "0.00", "cst": "53", "incluirNaBaseIcms": false },
+      "icms": { "cst": "00", "aliquotaInterna": "4.995", "aliquotaInterestadual": "4.995" },
+      "pisCofins": { "regime": "cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "0.65", "aliquotaCofins": "3.00" }
+    }
+  }
+}

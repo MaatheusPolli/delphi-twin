@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://delphi-twin/spec/schema/resultado.schema.json",
+  "title": "ResultadoTributos",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["icms", "ipi", "pis", "cofins", "totalTributos"],
+  "properties": {
+    "icms": { "$ref": "#/definitions/tributoBase" },
+    "icmsSt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bc", "aliquota", "valor", "mvaAplicada"],
+      "properties": {
+        "bc": { "$ref": "#/definitions/decimal" },
+        "aliquota": { "$ref": "#/definitions/decimal" },
+        "valor": { "$ref": "#/definitions/decimal" },
+        "mvaAplicada": { "$ref": "#/definitions/decimal" }
+      }
+    },
+    "ipi": { "$ref": "#/definitions/tributoBase" },
+    "pis": { "$ref": "#/definitions/tributoBase" },
+    "cofins": { "$ref": "#/definitions/tributoBase" },
+    "difal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valorOrigem", "valorDestino", "fcp"],
+      "properties": {
+        "valorOrigem": { "$ref": "#/definitions/decimal" },
+        "valorDestino": { "$ref": "#/definitions/decimal" },
+        "fcp": { "$ref": "#/definitions/decimal" }
+      }
+    },
+    "totalTributos": { "$ref": "#/definitions/decimal" }
+  },
+  "definitions": {
+    "tributoBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bc", "aliquota", "valor"],
+      "properties": {
+        "bc": { "$ref": "#/definitions/decimal" },
+        "aliquota": { "$ref": "#/definitions/decimal" },
+        "valor": { "$ref": "#/definitions/decimal" }
+      }
+    },
+    "decimal": {
+      "type": "string",
+      "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+      "description": "Valor decimal representado como string para preservar precisao exata (evita ponto flutuante)."
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://delphi-twin/spec/schema/operacao.schema.json",
+  "title": "OperacaoFiscal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ufOrigem", "ufDestino", "destinatarioContribuinte", "regimeEmitente", "item"],
+  "properties": {
+    "ufOrigem": { "$ref": "#/definitions/uf" },
+    "ufDestino": { "$ref": "#/definitions/uf" },
+    "destinatarioContribuinte": { "type": "boolean" },
+    "regimeEmitente": { "type": "string", "enum": ["normal", "simples"] },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valorProduto", "quantidade", "frete", "seguro", "desconto", "outras", "ipi", "icms", "pisCofins"],
+      "properties": {
+        "valorProduto": { "$ref": "#/definitions/decimal" },
+        "quantidade": { "$ref": "#/definitions/decimal" },
+        "frete": { "$ref": "#/definitions/decimal" },
+        "seguro": { "$ref": "#/definitions/decimal" },
+        "desconto": { "$ref": "#/definitions/decimal" },
+        "outras": { "$ref": "#/definitions/decimal" },
+        "ipi": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["aliquota", "cst"],
+          "properties": {
+            "aliquota": { "$ref": "#/definitions/decimal" },
+            "cst": { "type": "string" },
+            "incluirNaBaseIcms": { "type": "boolean" }
+          }
+        },
+        "icms": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cst", "aliquotaInterna", "aliquotaInterestadual"],
+          "properties": {
+            "cst": { "type": "string" },
+            "aliquotaInterna": { "$ref": "#/definitions/decimal" },
+            "aliquotaInterestadual": { "$ref": "#/definitions/decimal" },
+            "reducaoBC": { "$ref": "#/definitions/decimal" },
+            "mva": { "$ref": "#/definitions/decimal" },
+            "reducaoBCST": { "$ref": "#/definitions/decimal" },
+            "fcp": { "$ref": "#/definitions/decimal" }
+          }
+        },
+        "pisCofins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["regime", "cstPis", "cstCofins", "aliquotaPis", "aliquotaCofins"],
+          "properties": {
+            "regime": { "type": "string", "enum": ["cumulativo", "nao-cumulativo"] },
+            "cstPis": { "type": "string" },
+            "cstCofins": { "type": "string" },
+            "aliquotaPis": { "$ref": "#/definitions/decimal" },
+            "aliquotaCofins": { "$ref": "#/definitions/decimal" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "decimal": {
+      "type": "string",
+      "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+      "description": "Valor decimal representado como string para preservar precisao exata (evita ponto flutuante)."
+    },
+    "uf": {
+      "type": "string",
+      "enum": ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "icms-40-isento",
+  "descricao": "Venda interna SP->SP, CST 40 (isento), aliquota zero, sem ICMS devido.",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "SP",
+    "destinatarioContribuinte": true,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "1000.00",
+      "quantidade": "1",
+      "frete": "0.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": { "aliquota": "0.00", "cst": "53", "incluirNaBaseIcms": false },
+      "icms": { "cst": "40", "aliquotaInterna": "0.00", "aliquotaInterestadual": "0.00" },
+      "pisCofins": { "regime": "cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "0.65", "aliquotaCofins": "3.00" }
+    }
+  }
+}
