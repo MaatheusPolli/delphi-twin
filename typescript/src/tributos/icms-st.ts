@@ -1,0 +1,82 @@
+import { Decimal } from '../domain/decimal.js';
+import { aplicarPercentual, d, roundHalfEven2 } from '../domain/decimal.js';
+import type { OperacaoFiscal, ResultadoIcmsSt } from '../domain/types.js';
+import { operacaoInterna } from '../domain/types.js';
+
+/**
+ * Calculo do ICMS-ST (Substituicao Tributaria).
+ *
+ * Base legal: Convenio ICMS 142/2018 (regras gerais de ST) e Convenio ICMS
+ * 52/2017 (MVA ajustada em operacoes interestaduais).
+ *
+ *   MVA aplicada:
+ *     - Operacao interna: MVA original informada, sem ajuste.
+ *     - Operacao interestadual: MVA ajustada =
+ *         [(1 + MVA_original/100) x (1 - AliqInter/100) / (1 - AliqIntra/100) - 1] x 100
+ *       onde AliqIntra e a aliquota interna do estado de destino e AliqInter
+ *       e a aliquota interestadual da operacao.
+ *
+ *   BC_ST = (ValorProduto - Desconto + Frete + Seguro + Outras + ValorIPI)
+ *           com reducao de BC-ST (se houver) aplicada antes do MVA,
+ *           multiplicada por (1 + MVA_aplicada/100).
+ *
+ *   Valor_ST = (BC_ST x AliquotaInterna_destino) - ICMS proprio da operacao,
+ *   nunca negativo.
+ *
+ * A MVA ajustada e arredondada para 2 casas ANTES de compor a base, para
+ * que Delphi e TypeScript concordem no valor intermediario - do contrario a
+ * divisao (1-AliqInter)/(1-AliqIntra) poderia carregar precisao diferente
+ * em cada lado e divergir no ultimo digito.
+ *
+ * Espelha delphi/src/Tributos.IcmsST.pas.
+ */
+function calcularMvaAplicada(operacao: OperacaoFiscal): Decimal {
+  const mvaOriginal = operacao.item.icms.mva ?? d(0);
+
+  if (operacaoInterna(operacao)) {
+    return mvaOriginal;
+  }
+
+  const aliqInter = operacao.item.icms.aliquotaInterestadual;
+  const aliqIntra = operacao.item.icms.aliquotaInterna;
+
+  const fator = d(1)
+    .plus(mvaOriginal.dividedBy(100))
+    .times(d(1).minus(aliqInter.dividedBy(100)))
+    .dividedBy(d(1).minus(aliqIntra.dividedBy(100)))
+    .minus(1);
+
+  return fator.times(100);
+}
+
+export function calcularIcmsSt(
+  operacao: OperacaoFiscal,
+  valorIpi: Decimal,
+  valorIcmsProprio: Decimal,
+): ResultadoIcmsSt {
+  const { item } = operacao;
+
+  const baseAntesDoMva = item.valorProduto
+    .minus(item.desconto)
+    .plus(item.frete)
+    .plus(item.seguro)
+    .plus(item.outras)
+    .plus(valorIpi);
+
+  const baseComReducaoST = item.icms.reducaoBCST
+    ? aplicarPercentual(baseAntesDoMva, d(100).minus(item.icms.reducaoBCST))
+    : baseAntesDoMva;
+
+  const mvaAplicada = roundHalfEven2(calcularMvaAplicada(operacao));
+  const baseST = aplicarPercentual(baseComReducaoST, d(100).plus(mvaAplicada));
+
+  const bc = roundHalfEven2(baseST);
+  const aliquota = item.icms.aliquotaInterna;
+
+  let valor = roundHalfEven2(aplicarPercentual(bc, aliquota)).minus(valorIcmsProprio);
+  if (valor.isNegative()) {
+    valor = d(0);
+  }
+
+  return { bc, aliquota, valor, mvaAplicada };
+}
