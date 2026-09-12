@@ -117,12 +117,28 @@ export function parseResultado(json: any): ResultadoTributos {
   };
 }
 
+/**
+ * Mesmo padrao de spec/schema/case.schema.json para o campo "id". Validado
+ * aqui (alem da validacao via tools/validate-spec.ts) porque o id e usado
+ * para montar nomes de arquivo em results/{delphi,ts}/<id>.json - um id
+ * malicioso ou malformado (ex.: contendo "../") nao pode escapar da pasta
+ * de resultados.
+ */
+const ID_VALIDO = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+function validarId(id: unknown, arquivo: string): string {
+  if (typeof id !== 'string' || !ID_VALIDO.test(id)) {
+    throw new Error(`Caso invalido em ${arquivo}: "id" deve casar com ${ID_VALIDO} (recebido: ${JSON.stringify(id)})`);
+  }
+  return id;
+}
+
 export function carregarCasoDeArquivo(caminhoArquivo: string): CasoDeTeste {
   const texto = readFileSync(caminhoArquivo, 'utf8');
   const json = JSON.parse(texto);
 
   return {
-    id: json.id,
+    id: validarId(json.id, caminhoArquivo),
     descricao: json.descricao,
     entrada: parseOperacao(json.entrada),
     ...(json.esperado !== undefined ? { esperado: parseResultado(json.esperado) } : {}),

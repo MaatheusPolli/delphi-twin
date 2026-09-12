@@ -18,6 +18,20 @@ const arquivoRelatorio = join(raizRepo, 'report', 'comparison.md');
 
 type Campo = { rotulo: string; valor: string };
 
+/**
+ * Mesmo padrao de spec/schema/case.schema.json para "id". Validado aqui
+ * porque o id vira nome de arquivo dentro de results/{delphi,ts}/ - um id
+ * malformado (ex.: contendo "../") nao pode escapar dessas pastas.
+ */
+const ID_VALIDO = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+function validarId(id: unknown, arquivo: string): string {
+  if (typeof id !== 'string' || !ID_VALIDO.test(id)) {
+    throw new Error(`Caso invalido em ${arquivo}: "id" deve casar com ${ID_VALIDO} (recebido: ${JSON.stringify(id)})`);
+  }
+  return id;
+}
+
 function lerJsonSeExistir(caminho: string): any | undefined {
   if (!existsSync(caminho)) return undefined;
   return JSON.parse(readFileSync(caminho, 'utf8'));
@@ -183,7 +197,8 @@ function main(): void {
 
   const resultados = arquivosCase.map((arquivo) => {
     const caso = JSON.parse(readFileSync(join(pastaCases, arquivo), 'utf8'));
-    return compararCaso(caso.id, caso.descricao);
+    const id = validarId(caso.id, arquivo);
+    return compararCaso(id, caso.descricao);
   });
 
   const relatorio = gerarRelatorio(resultados);

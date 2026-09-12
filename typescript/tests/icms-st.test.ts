@@ -53,4 +53,18 @@ describe('calcularIcmsSt', () => {
 
     expect(resultado.valor.toFixed(2)).toBe('157.95');
   });
+
+  it('rejeita aliquota interna de destino >= 100% em vez de propagar Infinity', () => {
+    const operacao = operacaoPadrao();
+    const invalida = {
+      ...operacao,
+      ufDestino: 'MG' as const,
+      item: {
+        ...operacao.item,
+        icms: { ...operacao.item.icms, mva: d('40'), aliquotaInterna: d('100'), aliquotaInterestadual: d('12') },
+      },
+    };
+
+    expect(() => calcularIcmsSt(invalida, d('0'), d('126.00'))).toThrow(/deve ser menor que 100/);
+  });
 });
