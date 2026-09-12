@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://delphi-twin/spec/schema/case.schema.json",
+  "title": "CasoDeTeste",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "descricao", "entrada"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "descricao": { "type": "string", "minLength": 1 },
+    "entrada": { "$ref": "operacao.schema.json" },
+    "esperado": { "$ref": "resultado.schema.json" }
+  }
+}

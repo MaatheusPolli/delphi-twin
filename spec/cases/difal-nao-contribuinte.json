@@ -1,0 +1,21 @@
+{
+  "id": "difal-nao-contribuinte",
+  "descricao": "Venda interestadual SP->RJ para consumidor final nao contribuinte (EC 87/2015), partilha de DIFAL entre origem e destino, com FCP de 2%.",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "RJ",
+    "destinatarioContribuinte": false,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "1000.00",
+      "quantidade": "1",
+      "frete": "0.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": { "aliquota": "0.00", "cst": "53", "incluirNaBaseIcms": false },
+      "icms": { "cst": "00", "aliquotaInterna": "20.00", "aliquotaInterestadual": "12.00", "fcp": "2.00" },
+      "pisCofins": { "regime": "cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "0.65", "aliquotaCofins": "3.00" }
+    }
+  }
+}

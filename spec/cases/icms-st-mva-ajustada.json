@@ -1,0 +1,21 @@
+{
+  "id": "icms-st-mva-ajustada",
+  "descricao": "Venda interestadual SP->MG, contribuinte, CST 10 com ICMS-ST, MVA original 40% ajustada pela formula do Convenio ICMS 52/2017 (aliquota interna do destino 18%, interestadual 12%).",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "MG",
+    "destinatarioContribuinte": true,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "1000.00",
+      "quantidade": "1",
+      "frete": "50.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": { "aliquota": "0.00", "cst": "53", "incluirNaBaseIcms": false },
+      "icms": { "cst": "10", "aliquotaInterna": "18.00", "aliquotaInterestadual": "12.00", "mva": "40.00" },
+      "pisCofins": { "regime": "cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "0.65", "aliquotaCofins": "3.00" }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "pis-cofins-nao-cumulativo",
+  "descricao": "Regime nao cumulativo de PIS/COFINS (aliquotas 1.65% e 7.60%), venda interna simples.",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "SP",
+    "destinatarioContribuinte": true,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "1000.00",
+      "quantidade": "1",
+      "frete": "0.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": { "aliquota": "0.00", "cst": "53", "incluirNaBaseIcms": false },
+      "icms": { "cst": "00", "aliquotaInterna": "18.00", "aliquotaInterestadual": "18.00" },
+      "pisCofins": { "regime": "nao-cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "1.65", "aliquotaCofins": "7.60" }
+    }
+  }
+}
