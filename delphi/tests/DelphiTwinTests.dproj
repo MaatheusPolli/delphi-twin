@@ -37,13 +37,20 @@
         <DCCReference Include="Tests.Helpers.pas"/>
         <DCCReference Include="Tests.Decimal.pas"/>
         <DCCReference Include="Tests.Icms.pas"/>
+        <DCCReference Include="Tests.IcmsST.pas"/>
         <DCCReference Include="Tests.Ipi.pas"/>
         <DCCReference Include="Tests.PisCofins.pas"/>
+        <DCCReference Include="Tests.Difal.pas"/>
+        <DCCReference Include="Tests.Spec.pas"/>
         <DCCReference Include="..\src\Tributos.Types.pas"/>
         <DCCReference Include="..\src\Tributos.Decimal.pas"/>
         <DCCReference Include="..\src\Tributos.Icms.pas"/>
+        <DCCReference Include="..\src\Tributos.IcmsST.pas"/>
         <DCCReference Include="..\src\Tributos.Ipi.pas"/>
         <DCCReference Include="..\src\Tributos.PisCofins.pas"/>
+        <DCCReference Include="..\src\Tributos.Difal.pas"/>
+        <DCCReference Include="..\src\Tributos.Motor.pas"/>
+        <DCCReference Include="..\src\Tributos.SpecLoader.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_1</Key>
             <CfgParent>Base</CfgParent>
