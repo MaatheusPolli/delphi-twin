@@ -40,6 +40,18 @@ function calcularMvaAplicada(operacao: OperacaoFiscal): Decimal {
   const aliqInter = operacao.item.icms.aliquotaInterestadual;
   const aliqIntra = operacao.item.icms.aliquotaInterna;
 
+  // AliqIntra >= 100% zeraria (ou inverteria o sinal de) o denominador da
+  // formula de ajuste. Uma aliquota interna de 100% ou mais nao existe na
+  // legislacao brasileira - e melhor rejeitar com um erro claro do que
+  // deixar decimal.js retornar Infinity silenciosamente e contaminar o
+  // resto do calculo sem erro nenhum (o lado Delphi lanca EZeroDivide na
+  // mesma situacao - ver Tributos.IcmsST.pas).
+  if (aliqIntra.greaterThanOrEqualTo(100)) {
+    throw new Error(
+      `MVA ajustada (Convenio 52/2017): aliquota interna do destino invalida (${aliqIntra.toString()}%) - deve ser menor que 100%.`,
+    );
+  }
+
   const fator = d(1)
     .plus(mvaOriginal.dividedBy(100))
     .times(d(1).minus(aliqInter.dividedBy(100)))

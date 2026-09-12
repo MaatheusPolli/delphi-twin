@@ -1,6 +1,6 @@
 # Relatorio de comparacao Delphi x TypeScript
 
-Gerado em 2026-09-12T18:17:42.382Z.
+Gerado em 2026-09-12T18:34:11.003Z.
 
 ## Resumo
 

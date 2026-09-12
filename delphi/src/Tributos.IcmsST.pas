@@ -43,6 +43,7 @@ type
 implementation
 
 uses
+  SysUtils,
   Tributos.Decimal;
 
 function TCalculadoraIcmsST.CalcularMvaAplicada(const AOperacao: TOperacaoFiscal): Currency;
@@ -56,6 +57,17 @@ begin
 
   AliqInter := AOperacao.Item.Icms.AliquotaInterestadual;
   AliqIntra := AOperacao.Item.Icms.AliquotaInterna;
+
+  { AliqIntra >= 100% zeraria (ou inverteria o sinal de) o denominador da
+    formula de ajuste. Uma aliquota interna de 100% ou mais nao existe na
+    legislacao brasileira - e melhor rejeitar com um erro claro do que
+    deixar Currency lancar EZeroDivide (ou, do lado TypeScript, o
+    decimal.js retornar Infinity silenciosamente e contaminar o resto do
+    calculo sem erro nenhum). }
+  if AliqIntra >= 100 then
+    raise Exception.CreateFmt(
+      'MVA ajustada (Convenio 52/2017): aliquota interna do destino invalida (%s%%) - deve ser menor que 100%%.',
+      [CurrToStr(AliqIntra)]);
 
   Fator := (1 + MvaOriginal / 100) * (1 - AliqInter / 100) / (1 - AliqIntra / 100) - 1;
   Result := Fator * 100;

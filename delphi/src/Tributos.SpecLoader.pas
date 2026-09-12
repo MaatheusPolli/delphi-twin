@@ -158,11 +158,46 @@ begin
   end;
 end;
 
+{
+  Mesmo padrao de spec/schema/case.schema.json para "id". Validado aqui
+  (alem de tools/validate-spec.ts) porque o id e usado para montar nomes de
+  arquivo em results/delphi/<id>.json - um id malformado (ex.: contendo
+  "..\" ou "/") nao pode escapar da pasta de resultados.
+}
+function IdValido(const AId: string): Boolean;
+var
+  I: Integer;
+  UltimoFoiHifen: Boolean;
+begin
+  if AId = '' then
+    Exit(False);
+  if (AId[1] = '-') or (AId[Length(AId)] = '-') then
+    Exit(False);
+
+  UltimoFoiHifen := False;
+  for I := 1 to Length(AId) do
+  begin
+    if AId[I] = '-' then
+    begin
+      if UltimoFoiHifen then
+        Exit(False);
+      UltimoFoiHifen := True;
+    end
+    else if not (CharInSet(AId[I], ['a'..'z', '0'..'9'])) then
+      Exit(False)
+    else
+      UltimoFoiHifen := False;
+  end;
+  Result := True;
+end;
+
 function CarregarCasoDeJson(const AJson: TJSONObject): TCasoDeTeste;
 var
   EsperadoObj: TJSONValue;
 begin
   Result.Id := AJson.GetValue<string>('id');
+  if not IdValido(Result.Id) then
+    raise Exception.CreateFmt('Caso invalido: "id" deve casar com ^[a-z0-9]+(-[a-z0-9]+)*$ (recebido: %s)', [Result.Id]);
   Result.Descricao := AJson.GetValue<string>('descricao');
   Result.Entrada := CarregarOperacao(AJson.GetValue<TJSONObject>('entrada'));
 

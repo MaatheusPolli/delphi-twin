@@ -46,8 +46,8 @@
     },
     "decimal": {
       "type": "string",
-      "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
-      "description": "Valor decimal representado como string para preservar precisao exata (evita ponto flutuante)."
+      "pattern": "^-?[0-9]+(\\.[0-9]{1,4})?$",
+      "description": "Valor decimal representado como string para preservar precisao exata (evita ponto flutuante). Limitado a no maximo 4 casas decimais - mesmo limite de precisao nativa do Currency (Delphi); ver operacao.schema.json para detalhes."
     }
   }
 }

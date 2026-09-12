@@ -15,11 +15,14 @@ type
     procedure Calcular_OperacaoInterestadual_AjustaMvaPelaFormulaDoConvenio52;
     [Test]
     procedure Calcular_ValorST_SubtraiIcmsProprioDaBaseXAliquota;
+    [Test]
+    procedure Calcular_AliquotaInternaCemPorCento_LancaExcecao;
   end;
 
 implementation
 
 uses
+  SysUtils,
   Tributos.Types,
   Tributos.IcmsST,
   Tests.Helpers;
@@ -83,6 +86,31 @@ begin
   Resultado := Calculadora.Calcular(Operacao, 0, 126.00);
 
   Assert.AreEqual(Currency(157.95), Resultado.Valor);
+end;
+
+procedure TTestIcmsST.Calcular_AliquotaInternaCemPorCento_LancaExcecao;
+var
+  Operacao: TOperacaoFiscal;
+  Calculadora: ICalculadoraIcmsST;
+begin
+  { Aliquota interna >= 100% zeraria o denominador da formula de MVA
+    ajustada. Deve lancar um erro claro em vez de EZeroDivide sem contexto
+    (ou, no lado TypeScript, propagar Infinity silenciosamente - ver
+    icms-st.ts). }
+  Operacao := OperacaoPadrao;
+  Operacao.UfDestino := 'MG';
+  Operacao.Item.Icms.TemMva := True;
+  Operacao.Item.Icms.Mva := 40;
+  Operacao.Item.Icms.AliquotaInterna := 100;
+  Operacao.Item.Icms.AliquotaInterestadual := 12;
+
+  Calculadora := TCalculadoraIcmsST.Create;
+  Assert.WillRaise(
+    procedure
+    begin
+      Calculadora.Calcular(Operacao, 0, 126.00);
+    end,
+    Exception);
 end;
 
 initialization

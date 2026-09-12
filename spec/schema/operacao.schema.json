@@ -63,8 +63,8 @@
   "definitions": {
     "decimal": {
       "type": "string",
-      "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
-      "description": "Valor decimal representado como string para preservar precisao exata (evita ponto flutuante)."
+      "pattern": "^-?[0-9]+(\\.[0-9]{1,4})?$",
+      "description": "Valor decimal representado como string para preservar precisao exata (evita ponto flutuante). Limitado a no maximo 4 casas decimais porque o lado Delphi usa Currency, um tipo de ponto fixo com exatamente 4 casas decimais de precisao nativa - um valor com mais casas seria truncado/arredondado silenciosamente ao converter para Currency (StrToCurr), mas manteria precisao total do lado TypeScript (decimal.js), divergindo entre as duas implementacoes antes mesmo do arredondamento final."
     },
     "uf": {
       "type": "string",

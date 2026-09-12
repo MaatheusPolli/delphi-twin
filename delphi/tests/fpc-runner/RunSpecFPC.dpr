@@ -402,6 +402,38 @@ begin
   RodarCaso('base-frete-seguro-desconto', Op, Esp);
 end;
 
+{ ---- validacao de borda: aliquota interna >= 100% deve lancar erro, nao
+  travar com EZeroDivide silencioso nem (do lado TS) virar Infinity ---- }
+procedure TesteAliquotaInternaCemPorCentoLancaExcecao;
+var
+  Op: TOperacaoFiscal;
+  Motor: IMotorTributario;
+  Excecao: Boolean;
+begin
+  Op := OperacaoBase;
+  Op.UfDestino := 'MG';
+  Op.Item.Icms.AliquotaInterna := 100;
+  Op.Item.Icms.AliquotaInterestadual := 12;
+  Op.Item.Icms.TemMva := True;
+  Op.Item.Icms.Mva := 40;
+
+  Excecao := False;
+  Motor := TMotorTributario.CreatePadrao;
+  try
+    Motor.Calcular(Op);
+  except
+    Excecao := True;
+  end;
+
+  if Excecao then
+    Inc(TotalOK)
+  else
+  begin
+    Inc(TotalFalha);
+    Writeln('FALHA [aliquota-interna-100] esperava excecao, nao lancou nenhuma');
+  end;
+end;
+
 begin
   TotalOK := 0;
   TotalFalha := 0;
@@ -428,6 +460,7 @@ begin
   TesteArredondamentoLimite;
   TesteIcms40Isento;
   TesteBaseFreteSeguroDesconto;
+  TesteAliquotaInternaCemPorCentoLancaExcecao;
 
   Writeln;
   Writeln(Format('%d verificacoes OK, %d falha(s).', [TotalOK, TotalFalha]));
