@@ -1,0 +1,59 @@
+name: TypeScript
+
+on:
+  push:
+    paths:
+      - 'typescript/**'
+      - 'spec/**'
+      - 'tools/**'
+      - 'package.json'
+      - '.github/workflows/ts.yml'
+  pull_request:
+    paths:
+      - 'typescript/**'
+      - 'spec/**'
+      - 'tools/**'
+      - 'package.json'
+      - '.github/workflows/ts.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias (raiz)
+        run: npm install
+
+      - name: Instalar dependencias (typescript/)
+        run: npm ci
+        working-directory: typescript
+
+      - name: Validar spec/cases contra o schema (RF08)
+        run: npm run validate-spec
+
+      - name: Typecheck
+        run: npm run typecheck
+        working-directory: typescript
+
+      - name: Lint
+        run: npm run lint
+        working-directory: typescript
+
+      - name: Vitest (unitarios + spec.test.ts)
+        run: npm test
+        working-directory: typescript
+
+      - name: Rodar a spec e gerar results/ts/*.json
+        run: npm run run-spec
+        working-directory: typescript
+
+      - name: Upload de results/ts (para o job de comparacao)
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-ts
+          path: results/ts/

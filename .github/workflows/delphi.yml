@@ -1,0 +1,73 @@
+name: Delphi
+
+# NOTA IMPORTANTE (constraint verificada na pratica durante o desenvolvimento
+# deste projeto): o Delphi 12 Community Edition BLOQUEIA compilacao via linha
+# de comando - `dcc32`/`msbuild` retornam "This version of the product does
+# not support command line compiling". Isso significa que a suite DUnitX
+# completa (delphi/tests/DelphiTwinTests.dproj) so pode ser compilada e
+# executada manualmente, dentro da IDE, OU em um runner self-hosted com uma
+# licenca Delphi que permita build headless (Professional/Enterprise/
+# Architect, ou a variavel de licenca de CI da Embarcadero).
+#
+# Fallback documentado (conforme planejamento.md, secao 5): usamos o Free
+# Pascal Compiler (FPC), gratuito e scriptavel, para pelo menos COMPILAR em
+# modo Delphi ($mode delphi) o nucleo puro de regras fiscais (Tributos.Types,
+# Tributos.Decimal, Tributos.Icms, Tributos.IcmsST, Tributos.Ipi,
+# Tributos.PisCofins, Tributos.Difal) - unidades que dependem apenas de
+# System.SysUtils. Isso pega erros de sintaxe/tipo no core, mas NAO substitui
+# rodar a suite DUnitX real (Tributos.Motor e Tributos.SpecLoader usam
+# System.JSON/System.IOUtils, sem cobertura equivalente no FPC, e ficam fora
+# deste job). Job marcado continue-on-error ate ser validado em um ambiente
+# com FPC disponivel.
+
+on:
+  push:
+    paths:
+      - 'delphi/**'
+      - '.github/workflows/delphi.yml'
+  pull_request:
+    paths:
+      - 'delphi/**'
+      - '.github/workflows/delphi.yml'
+
+jobs:
+  fpc-compile-check-core:
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar Free Pascal Compiler
+        run: choco install --no-progress -y freepascal
+
+      - name: Compilar o nucleo de regras fiscais em modo Delphi
+        shell: pwsh
+        run: |
+          $unidades = @(
+            'Tributos.Decimal.pas',
+            'Tributos.Types.pas',
+            'Tributos.Icms.pas',
+            'Tributos.IcmsST.pas',
+            'Tributos.Ipi.pas',
+            'Tributos.PisCofins.pas',
+            'Tributos.Difal.pas'
+          )
+          New-Item -ItemType Directory -Force -Path delphi/src/fpc-out | Out-Null
+          foreach ($u in $unidades) {
+            Write-Host "Compilando $u..."
+            fpc -Mdelphi -Sc -FEdelphi/src/fpc-out -FUdelphi/src/fpc-out "delphi/src/$u"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Falha ao compilar $u com FPC"
+              exit 1
+            }
+          }
+
+  lembrete-dunitx-manual:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lembrete
+        run: |
+          echo "A suite DUnitX completa (delphi/tests/DelphiTwinTests.dproj) precisa"
+          echo "ser compilada e executada manualmente na IDE do Delphi 12, ou em um"
+          echo "runner self-hosted com licenca de build headless. Community Edition"
+          echo "nao suporta compilacao via linha de comando (dcc32/msbuild)."

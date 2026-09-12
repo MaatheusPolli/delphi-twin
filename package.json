@@ -1,0 +1,19 @@
+{
+  "name": "delphi-twin",
+  "version": "1.0.0",
+  "description": "Ferramentas de nivel de repositorio: validacao da spec e comparacao Delphi x TypeScript.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate-spec": "tsx tools/validate-spec.ts",
+    "compare": "tsx tools/compare.ts",
+    "test:ts": "npm --prefix typescript test",
+    "typecheck:ts": "npm --prefix typescript run typecheck"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "decimal.js": "^10.4.3",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}
