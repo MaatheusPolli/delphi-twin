@@ -17,5 +17,13 @@
       "icms": { "cst": "10", "aliquotaInterna": "18.00", "aliquotaInterestadual": "12.00", "mva": "40.00" },
       "pisCofins": { "regime": "cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "0.65", "aliquotaCofins": "3.00" }
     }
+  },
+  "esperado": {
+    "icms": { "bc": "1050.00", "aliquota": "12.00", "valor": "126.00" },
+    "icmsSt": { "bc": "1577.52", "aliquota": "18.00", "valor": "157.95", "mvaAplicada": "50.24" },
+    "ipi": { "bc": "1050.00", "aliquota": "0.00", "valor": "0.00" },
+    "pis": { "bc": "1050.00", "aliquota": "0.65", "valor": "6.82" },
+    "cofins": { "bc": "1050.00", "aliquota": "3.00", "valor": "31.50" },
+    "totalTributos": "322.27"
   }
 }
