@@ -1,24 +1,30 @@
 name: Delphi
 
-# NOTA IMPORTANTE (constraint verificada na pratica durante o desenvolvimento
-# deste projeto): o Delphi 12 Community Edition BLOQUEIA compilacao via linha
-# de comando - `dcc32`/`msbuild` retornam "This version of the product does
+# NOTA (constraint verificada na pratica durante o desenvolvimento deste
+# projeto): o Delphi 12 Community Edition BLOQUEIA compilacao via linha de
+# comando - `dcc32`/`msbuild` retornam "This version of the product does
 # not support command line compiling". Isso significa que a suite DUnitX
 # completa (delphi/tests/DelphiTwinTests.dproj) so pode ser compilada e
 # executada manualmente, dentro da IDE, OU em um runner self-hosted com uma
 # licenca Delphi que permita build headless (Professional/Enterprise/
 # Architect, ou a variavel de licenca de CI da Embarcadero).
 #
-# Fallback documentado (conforme planejamento.md, secao 5): usamos o Free
-# Pascal Compiler (FPC), gratuito e scriptavel, para pelo menos COMPILAR em
-# modo Delphi ($mode delphi) o nucleo puro de regras fiscais (Tributos.Types,
-# Tributos.Decimal, Tributos.Icms, Tributos.IcmsST, Tributos.Ipi,
-# Tributos.PisCofins, Tributos.Difal) - unidades que dependem apenas de
-# System.SysUtils. Isso pega erros de sintaxe/tipo no core, mas NAO substitui
-# rodar a suite DUnitX real (Tributos.Motor e Tributos.SpecLoader usam
-# System.JSON/System.IOUtils, sem cobertura equivalente no FPC, e ficam fora
-# deste job). Job marcado continue-on-error ate ser validado em um ambiente
-# com FPC disponivel.
+# Fallback documentado (planejamento.md, secao 5): usamos o Free Pascal
+# Compiler (FPC), gratuito e scriptavel, para compilar em modo Delphi
+# ($mode delphi) o MESMO codigo-fonte de delphi/src/*.pas (nucleo puro de
+# regras fiscais - Tributos.Types, Tributos.Decimal, Tributos.Icms,
+# Tributos.IcmsST, Tributos.Ipi, Tributos.PisCofins, Tributos.Difal,
+# Tributos.Motor) e rodar de verdade os 11 casos da spec via
+# delphi/tests/fpc-runner/RunSpecFPC.dpr, incluindo a prova em tempo de
+# execucao de que Round() sobre Currency se comporta como ROUND_HALF_EVEN
+# (banker's rounding) - a mesma suposicao usada no lado TypeScript
+# (decimal.js com ROUND_HALF_EVEN). Isso valida de fato as formulas, nao
+# apenas a sintaxe.
+#
+# O que este job NAO cobre: Tributos.SpecLoader.pas e DelphiTwin.dpr usam
+# System.JSON/System.IOUtils, sem equivalente direto no FPC, entao a leitura
+# de spec/cases/*.json e a suite DUnitX completa continuam exigindo a IDE
+# do Delphi (ou um runner licenciado para build headless).
 
 on:
   push:
@@ -31,43 +37,43 @@ on:
       - '.github/workflows/delphi.yml'
 
 jobs:
-  fpc-compile-check-core:
+  fpc-run-spec:
     runs-on: windows-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
       - name: Instalar Free Pascal Compiler
         run: choco install --no-progress -y freepascal
 
-      - name: Compilar o nucleo de regras fiscais em modo Delphi
+      - name: Compilar delphi/tests/fpc-runner/RunSpecFPC.dpr em modo Delphi
         shell: pwsh
+        working-directory: delphi/tests/fpc-runner
         run: |
-          $unidades = @(
-            'Tributos.Decimal.pas',
-            'Tributos.Types.pas',
-            'Tributos.Icms.pas',
-            'Tributos.IcmsST.pas',
-            'Tributos.Ipi.pas',
-            'Tributos.PisCofins.pas',
-            'Tributos.Difal.pas'
-          )
-          New-Item -ItemType Directory -Force -Path delphi/src/fpc-out | Out-Null
-          foreach ($u in $unidades) {
-            Write-Host "Compilando $u..."
-            fpc -Mdelphi -Sc -FEdelphi/src/fpc-out -FUdelphi/src/fpc-out "delphi/src/$u"
-            if ($LASTEXITCODE -ne 0) {
-              Write-Error "Falha ao compilar $u com FPC"
-              exit 1
-            }
-          }
+          $fpc = Get-ChildItem "C:\FPC" -Recurse -Filter fpc.exe | Select-Object -First 1
+          New-Item -ItemType Directory -Force -Path out | Out-Null
+          & $fpc.FullName -Mdelphi -Sc -FEout -FUout RunSpecFPC.dpr
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Rodar os 11 casos da spec (inclui prova do ROUND_HALF_EVEN)
+        shell: pwsh
+        working-directory: delphi/tests/fpc-runner
+        run: |
+          .\out\RunSpecFPC.exe
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Upload de results/delphi (para o job de comparacao)
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-delphi
+          path: results/delphi/
 
   lembrete-dunitx-manual:
     runs-on: ubuntu-latest
     steps:
       - name: Lembrete
         run: |
-          echo "A suite DUnitX completa (delphi/tests/DelphiTwinTests.dproj) precisa"
-          echo "ser compilada e executada manualmente na IDE do Delphi 12, ou em um"
-          echo "runner self-hosted com licenca de build headless. Community Edition"
-          echo "nao suporta compilacao via linha de comando (dcc32/msbuild)."
+          echo "A suite DUnitX completa (delphi/tests/DelphiTwinTests.dproj) e"
+          echo "Tributos.SpecLoader (leitura de spec/cases/*.json via System.JSON)"
+          echo "precisam ser rodadas manualmente na IDE do Delphi 12, ou em um"
+          echo "runner self-hosted com licenca de build headless. Community"
+          echo "Edition nao suporta compilacao via linha de comando (dcc32/msbuild)."
