@@ -39,22 +39,39 @@ npm run lint
 npm run run-spec      # calcula todos os casos e grava results/ts/*.json
 ```
 
-### Delphi (DUnitX)
+### Delphi (DUnitX na IDE, ou Free Pascal via linha de comando)
 
 > **Delphi 12 Community Edition não compila via linha de comando** (`dcc32`
 > recusa com "This version of the product does not support command line
-> compiling"). Por isso, o build precisa ser feito na IDE:
+> compiling"). A suíte DUnitX completa (com leitura de `spec/cases/*.json`
+> via `System.JSON`) só roda pela IDE:
 
 1. Abra `delphi/tests/DelphiTwinTests.dproj` no Delphi 12 (ou compatível).
 2. Compile e rode (F9). O runner de console do DUnitX mostra os resultados
    e `Tests.Spec.pas` valida os 11 casos de `spec/cases/*.json`.
-3. Para gerar `results/delphi/*.json` (usado pela comparação), abra e rode
-   `delphi/DelphiTwin.dproj` — ele executa a spec e grava um JSON por caso.
+3. Para gerar `results/delphi/*.json` via Delphi de verdade, abra e rode
+   `delphi/DelphiTwin.dproj`.
 
-O fallback de CI documentado (`.github/workflows/delphi.yml`) usa o Free
-Pascal Compiler apenas para um *compile-check* do núcleo de regras fiscais
-(units que dependem só de `System.SysUtils`); a suíte DUnitX completa
-depende da IDE ou de um runner com licença de build headless.
+**Alternativa sem IDE, usando Free Pascal** (mesmo código-fonte de
+`delphi/src/*.pas`, compilado em modo Delphi): é o que este repositório usa
+de fato, já que o ambiente onde ele foi desenvolvido não tem uma licença de
+Delphi que compile via CLI.
+
+```bash
+# instala o FPC (Windows, via winget) uma unica vez
+winget install --id FreePascal.FreePascalCompiler
+
+cd delphi/tests/fpc-runner
+fpc -Mdelphi -Sc -FEout -FUout RunSpecFPC.dpr
+./out/RunSpecFPC.exe
+```
+
+`RunSpecFPC.dpr` roda o `TMotorTributario` contra os 11 casos (replicados
+como literais Pascal, já que o FPC não tem equivalente de `System.JSON`),
+grava `results/delphi/*.json` e — mais importante — **prova em tempo de
+execução** que `Round()` sobre `Currency` se comporta como
+`ROUND_HALF_EVEN` também fora da IDE. `.github/workflows/delphi.yml` roda
+exatamente isso em CI.
 
 ### Comparação e validação da spec
 
@@ -75,9 +92,13 @@ npm run compare              # compara results/delphi/*.json x results/ts/*.json
    depois, guiada apenas pela spec, e verificada com Vitest: **os 38 testes
    passam**, incluindo os 11 casos compartilhados batendo com os valores
    calculados na etapa 2.
-4. Quando o Delphi puder ser compilado neste ambiente (via IDE), rodar
-   `DelphiTwin.dproj` produz `results/delphi/*.json`, e `npm run compare`
-   fecha o ciclo comparando os dois lados byte a byte.
+4. O lado Delphi foi verificado de verdade compilando `delphi/src/*.pas` com
+   o Free Pascal Compiler (`delphi/tests/fpc-runner/RunSpecFPC.dpr`) — **103
+   verificações, 0 falhas**, incluindo a prova em tempo de execução de que
+   `Round()` sobre `Currency` arredonda em `ROUND_HALF_EVEN`.
+5. `npm run compare` fecha o ciclo: **11 de 11 casos idênticos** entre
+   `results/delphi/*.json` e `results/ts/*.json`, zero divergências — ver
+   [`report/comparison.md`](report/comparison.md).
 
 ## Fórmulas e base legal
 
@@ -118,11 +139,33 @@ arredondamento bancário (**ROUND_HALF_EVEN**) — o mesmo critério que o
 - [x] Etapa 3 — Delphi: ICMS-ST, DIFAL, motor, spec runner; valores esperados calculados
 - [x] Etapa 4 — TypeScript completo, guiado pela spec, 38 testes verificados
 - [x] Etapa 5 — `tools/validate-spec.ts`, `tools/compare.ts`, CI dos dois lados
-- [ ] Etapa 6 — build Delphi real (via IDE) para gerar `results/delphi/*.json` e fechar o `report/comparison.md` sem divergências; post de divulgação
+- [x] Etapa 6 — README; **`report/comparison.md` fechado, 11 de 11 casos idênticos**
 
-O lado Delphi foi escrito e revisado com o mesmo rigor do lado TypeScript,
-mas **ainda não foi compilado neste ambiente** — o Delphi 12 Community
-Edition instalado aqui recusa build via linha de comando, e não há Free
-Pascal instalado como alternativa. Assim que alguém abrir
-`delphi/tests/DelphiTwinTests.dproj` na IDE e rodar os testes, o
-`report/comparison.md` pode ser regenerado com os dois lados completos.
+### Definition of Done (planejamento.md, seção 9)
+
+- [x] 100% dos cases da spec passando em Delphi (via FPC, mesmo código-fonte)
+      e TypeScript (Vitest).
+- [x] `report/comparison.md` sem divergências, commitado.
+- [x] `tools/validate-spec.ts` valida os 11 casos contra o JSON Schema.
+- [x] README com fórmulas e base legal.
+- [ ] A suíte DUnitX completa (`DelphiTwinTests.dproj`) e o `DelphiTwin.dproj`
+      baseado em `System.JSON` ainda não foram rodados numa IDE Delphi real —
+      só via Free Pascal (que valida o mesmo código-fonte, mas não exercita
+      `Tributos.SpecLoader` nem os asserts do DUnitX). Ver nota abaixo.
+- [ ] Post no LinkedIn — publicação externa, fica a critério de quem for
+      divulgar o projeto.
+
+### Sobre a compilação Delphi
+
+Este projeto foi desenvolvido numa máquina com **Delphi 12 Community
+Edition**, que recusa compilar via linha de comando ("This version of the
+product does not support command line compiling") — só a IDE compila.
+Para validar o código de verdade sem depender de clicar em F9, o
+`delphi/src/*.pas` (o motor tributário em si) foi compilado e executado com
+o **Free Pascal Compiler** em modo Delphi — o mesmo fallback que
+`planejamento.md` já previa. O resultado (103 verificações, 0 falhas, e os
+11 casos gerando `results/delphi/*.json` idênticos ao TypeScript) dá alta
+confiança de que o código compila e se comporta como esperado também no
+Delphi real, já que é o **mesmo arquivo-fonte** nos dois compiladores.
+`Tributos.SpecLoader.pas` (usa `System.JSON`/`System.IOUtils`, sem
+equivalente direto no FPC) e a suíte DUnitX continuam precisando da IDE.

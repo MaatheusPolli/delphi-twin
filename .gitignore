@@ -11,3 +11,7 @@ delphi/**/__history/
 delphi/**/__recovery/
 delphi/**/Win32/
 delphi/**/Win64/
+delphi/**/*.ppu
+delphi/**/*.o
+delphi/src/fpc-out/
+delphi/tests/fpc-runner/out/

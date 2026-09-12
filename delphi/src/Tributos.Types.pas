@@ -12,7 +12,7 @@ unit Tributos.Types;
 interface
 
 uses
-  System.SysUtils;
+  SysUtils;
 
 type
   TUF = string;
