@@ -1,9 +1,12 @@
 # Delphi Twin
 
-> **Licença**: todos os direitos reservados. Este repositório é publicado
-> apenas para fins de portfólio/avaliação — cópia, uso, modificação ou
-> redistribuição não são permitidos sem autorização por escrito do autor.
-> Ver [LICENSE](LICENSE).
+Migração de um motor de cálculo tributário (ICMS, ICMS-ST, IPI, PIS/COFINS,
+DIFAL) de **Delphi** para **TypeScript**, com a mesma suíte de testes
+provando — caso a caso — que as duas implementações calculam exatamente o
+mesmo imposto.
+
+> 📄 Projeto de portfólio. Ver [LICENSE](LICENSE) — todos os direitos
+> reservados — antes de reutilizar qualquer parte do código.
 
 ## 1. Visão geral
 
