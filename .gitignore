@@ -15,3 +15,4 @@ delphi/**/*.ppu
 delphi/**/*.o
 delphi/src/fpc-out/
 delphi/tests/fpc-runner/out/
+/GITHUB/
