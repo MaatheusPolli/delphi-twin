@@ -1,18 +1,36 @@
-results/
+# Ignorar planejamentos locais
+planejamento.md
+Catalogo-ideias.md
+Curriculo.md
+
+# Ignorar variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# Ignorar dependências
 node_modules/
-typescript/node_modules/
-typescript/dist/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Ignorar build
+dist/
+build/
+.next/
+out/
+
+# Ignorar logs
 *.log
-delphi/**/*.dcu
-delphi/**/*.exe
-delphi/**/*.local
-delphi/**/*.identcache
-delphi/**/__history/
-delphi/**/__recovery/
-delphi/**/Win32/
-delphi/**/Win64/
-delphi/**/*.ppu
-delphi/**/*.o
-delphi/src/fpc-out/
-delphi/tests/fpc-runner/out/
-/GITHUB/
+logs/
+
+# Ignorar IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignorar OS
+.DS_Store
+Thumbs.db
