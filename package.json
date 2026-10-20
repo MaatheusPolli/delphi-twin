@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Ferramentas de nivel de repositorio: validacao da spec e comparacao Delphi x TypeScript.",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "scripts": {
     "validate-spec": "tsx tools/validate-spec.ts",

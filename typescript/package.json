@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Gemeo em TypeScript do motor tributario Delphi - mesma spec, mesmos casos.",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
