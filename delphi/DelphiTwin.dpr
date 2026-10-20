@@ -19,6 +19,7 @@ uses
   Tributos.Ipi in 'src\Tributos.Ipi.pas',
   Tributos.PisCofins in 'src\Tributos.PisCofins.pas',
   Tributos.Difal in 'src\Tributos.Difal.pas',
+  Tributos.Fcp in 'src\Tributos.Fcp.pas',
   Tributos.Motor in 'src\Tributos.Motor.pas',
   Tributos.SpecLoader in 'src\Tributos.SpecLoader.pas';
 

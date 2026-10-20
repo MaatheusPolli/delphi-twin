@@ -40,6 +40,7 @@
         <DCCReference Include="src\Tributos.Ipi.pas"/>
         <DCCReference Include="src\Tributos.PisCofins.pas"/>
         <DCCReference Include="src\Tributos.Difal.pas"/>
+        <DCCReference Include="src\Tributos.Fcp.pas"/>
         <DCCReference Include="src\Tributos.Motor.pas"/>
         <DCCReference Include="src\Tributos.SpecLoader.pas"/>
         <BuildConfiguration Include="Debug">

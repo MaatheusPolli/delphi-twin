@@ -1,6 +1,6 @@
 import { Decimal } from '../domain/decimal.js';
 import { aplicarPercentual, d, roundHalfEven2 } from '../domain/decimal.js';
-import type { OperacaoFiscal, TributoBase } from '../domain/types.js';
+import type { ItemIcms, OperacaoFiscal, TributoBase } from '../domain/types.js';
 import { operacaoInterna } from '../domain/types.js';
 
 /**
@@ -34,7 +34,28 @@ export function calcularIcms(operacao: OperacaoFiscal, valorIpiParaBase: Decimal
   const aliquota = operacaoInterna(operacao) ? item.icms.aliquotaInterna : item.icms.aliquotaInterestadual;
 
   const bc = roundHalfEven2(baseComReducao);
-  const valor = roundHalfEven2(aplicarPercentual(bc, aliquota));
+  const valor = icmsProprioDestacado(item.icms) ? roundHalfEven2(aplicarPercentual(bc, aliquota)) : d(0);
 
   return { bc, aliquota, valor };
+}
+
+/**
+ * CST 30 (isenta/nao tributada com cobranca de ST) e CST 60 (ICMS cobrado
+ * anteriormente por ST): o ICMS proprio nao e destacado na nota (valor 0),
+ * mas a BC continua informada. Espelha Tributos.Icms.pas.
+ */
+export function icmsProprioDestacado(icms: ItemIcms): boolean {
+  return !icms.desonerado && icms.cst !== '30' && icms.cst !== '60';
+}
+
+/**
+ * ICMS desonerado (art. 155 par. 2 II 'a' CF/88 e Convenio ICMS 109/2019 - campo
+ * vICMSDeson da NF-e): quando a operacao e desonerada, o imposto nao e cobrado
+ * (valor do ICMS proprio = 0), mas o montante que deixou de ser cobrado e
+ * informado separadamente.
+ *
+ *   ICMSDesonerado = BC x Aliquota / 100 (sem cobrar do destinatario).
+ */
+export function calcularIcmsDesonerado(icms: TributoBase): Decimal {
+  return roundHalfEven2(aplicarPercentual(icms.bc, icms.aliquota));
 }

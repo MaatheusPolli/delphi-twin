@@ -1,0 +1,66 @@
+{
+  "id": "cst-70-reducao-st",
+  "descricao": "Venda interna SP->SP, CST 70 (com reducao de BC de 33.33% e cobranca de ST com MVA de 40%).",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "SP",
+    "destinatarioContribuinte": true,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "1000.00",
+      "quantidade": "1",
+      "frete": "0.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": {
+        "aliquota": "0.00",
+        "cst": "53",
+        "incluirNaBaseIcms": false
+      },
+      "icms": {
+        "cst": "70",
+        "aliquotaInterna": "18.00",
+        "aliquotaInterestadual": "18.00",
+        "reducaoBC": "33.33",
+        "mva": "40.00"
+      },
+      "pisCofins": {
+        "regime": "cumulativo",
+        "cstPis": "01",
+        "cstCofins": "01",
+        "aliquotaPis": "0.65",
+        "aliquotaCofins": "3.00"
+      }
+    }
+  },
+  "esperado": {
+    "icms": {
+      "bc": "666.70",
+      "aliquota": "18.00",
+      "valor": "120.01"
+    },
+    "ipi": {
+      "bc": "1000.00",
+      "aliquota": "0.00",
+      "valor": "0.00"
+    },
+    "pis": {
+      "bc": "1000.00",
+      "aliquota": "0.65",
+      "valor": "6.50"
+    },
+    "cofins": {
+      "bc": "1000.00",
+      "aliquota": "3.00",
+      "valor": "30.00"
+    },
+    "icmsSt": {
+      "bc": "1400.00",
+      "aliquota": "18.00",
+      "valor": "131.99",
+      "mvaAplicada": "40.00"
+    },
+    "totalTributos": "288.50"
+  }
+}

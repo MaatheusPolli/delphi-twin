@@ -32,6 +32,8 @@ type
     function Calcular(const AOperacao: TOperacaoFiscal; const AValorIpiParaBase: Currency): TTributoBase;
   end;
 
+function CalcularIcmsDesonerado(const ATributo: TTributoBase): Currency;
+
 implementation
 
 uses
@@ -60,7 +62,15 @@ begin
 
   Result.Bc := RoundHalfEven2(BaseComReducao);
   Result.Aliquota := Aliquota;
-  Result.Valor := RoundHalfEven2(AplicarPercentual(Result.Bc, Aliquota));
+  if (not Item.Icms.Desonerado) and (Item.Icms.Cst <> '30') and (Item.Icms.Cst <> '60') then
+    Result.Valor := RoundHalfEven2(AplicarPercentual(Result.Bc, Aliquota))
+  else
+    Result.Valor := 0;
+end;
+
+function CalcularIcmsDesonerado(const ATributo: TTributoBase): Currency;
+begin
+  Result := RoundHalfEven2(AplicarPercentual(ATributo.Bc, ATributo.Aliquota));
 end;
 
 end.

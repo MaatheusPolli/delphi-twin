@@ -24,6 +24,8 @@ type
     Aliquota: Currency;
     Cst: string;
     IncluirNaBaseIcms: Boolean;
+    ReducaoAliquota: Currency;
+    TemReducaoAliquota: Boolean;
   end;
 
   TItemIcms = record
@@ -38,6 +40,7 @@ type
     TemReducaoBCST: Boolean;
     Fcp: Currency;
     TemFcp: Boolean;
+    Desonerado: Boolean;
   end;
 
   TItemPisCofins = record
@@ -82,6 +85,12 @@ type
     MvaAplicada: Currency;
   end;
 
+  TResultadoFcp = record
+    Bc: Currency;
+    Aliquota: Currency;
+    Valor: Currency;
+  end;
+
   TResultadoDifal = record
     ValorOrigem: Currency;
     ValorDestino: Currency;
@@ -97,6 +106,10 @@ type
     Cofins: TTributoBase;
     Difal: TResultadoDifal;
     TemDifal: Boolean;
+    Fcp: TResultadoFcp;
+    TemFcp: Boolean;
+    IcmsDesonerado: Currency;
+    TemIcmsDesonerado: Boolean;
     TotalTributos: Currency;
   end;
 

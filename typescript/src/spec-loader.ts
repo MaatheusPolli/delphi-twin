@@ -34,7 +34,8 @@ function parseItemIpi(json: any): ItemIpi {
   return {
     aliquota: d(json.aliquota),
     cst: json.cst,
-    ...(json.incluirNaBaseIcms !== undefined ? { incluirNaBaseIcms: json.incluirNaBaseIcms } : {}),
+    ...(json.incluirNaBaseIcms !== undefined ? { incluirNaBaseIcms: json.incluirNaBaseIcms as boolean } : {}),
+    ...(json.reducaoAliquota !== undefined ? { reducaoAliquota: d(json.reducaoAliquota) } : {}),
   };
 }
 
@@ -47,6 +48,7 @@ function parseItemIcms(json: any): ItemIcms {
     ...(json.mva !== undefined ? { mva: d(json.mva) } : {}),
     ...(json.reducaoBCST !== undefined ? { reducaoBCST: d(json.reducaoBCST) } : {}),
     ...(json.fcp !== undefined ? { fcp: d(json.fcp) } : {}),
+    ...(json.desonerado !== undefined ? { desonerado: json.desonerado as boolean } : {}),
   };
 }
 
@@ -111,6 +113,16 @@ export function parseResultado(json: any): ResultadoTributos {
             valorOrigem: d(json.difal.valorOrigem),
             valorDestino: d(json.difal.valorDestino),
             fcp: d(json.difal.fcp),
+          },
+        }
+      : {}),
+    ...(json.icmsDesonerado !== undefined ? { icmsDesonerado: d(json.icmsDesonerado) } : {}),
+    ...(json.fcp !== undefined
+      ? {
+          fcp: {
+            bc: d(json.fcp.bc),
+            aliquota: d(json.fcp.aliquota),
+            valor: d(json.fcp.valor),
           },
         }
       : {}),
@@ -182,5 +194,7 @@ export function resultadoParaJson(resultado: ResultadoTributos): object {
           },
         }
       : {}),
+    ...(resultado.fcp ? { fcp: tributoBaseParaJson(resultado.fcp) } : {}),
+    ...(resultado.icmsDesonerado ? { icmsDesonerado: resultado.icmsDesonerado.toFixed(2) } : {}),
   };
 }

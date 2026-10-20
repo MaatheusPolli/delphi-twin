@@ -36,6 +36,7 @@ export interface ItemIpi {
   readonly aliquota: Decimal;
   readonly cst: string;
   readonly incluirNaBaseIcms?: boolean;
+  readonly reducaoAliquota?: Decimal;
 }
 
 export interface ItemIcms {
@@ -46,6 +47,7 @@ export interface ItemIcms {
   readonly mva?: Decimal;
   readonly reducaoBCST?: Decimal;
   readonly fcp?: Decimal;
+  readonly desonerado?: boolean;
 }
 
 export interface ItemPisCofins {
@@ -95,6 +97,12 @@ export interface ResultadoDifal {
   readonly fcp: Decimal;
 }
 
+export interface ResultadoFcp {
+  readonly bc: Decimal;
+  readonly aliquota: Decimal;
+  readonly valor: Decimal;
+}
+
 export interface ResultadoTributos {
   readonly icms: TributoBase;
   readonly icmsSt?: ResultadoIcmsSt;
@@ -102,6 +110,8 @@ export interface ResultadoTributos {
   readonly pis: TributoBase;
   readonly cofins: TributoBase;
   readonly difal?: ResultadoDifal;
+  readonly fcp?: ResultadoFcp;
+  readonly icmsDesonerado?: Decimal;
   readonly totalTributos: Decimal;
 }
 

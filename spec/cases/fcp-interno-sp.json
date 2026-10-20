@@ -1,0 +1,29 @@
+{
+  "id": "fcp-interno-sp",
+  "descricao": "Venda interna SP->SP com FCP de 2% sobre a base do ICMS (art. 82 ADCT da CF/88), CST 00.",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "SP",
+    "destinatarioContribuinte": false,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "1000.00",
+      "quantidade": "1",
+      "frete": "0.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": { "aliquota": "0.00", "cst": "53", "incluirNaBaseIcms": false },
+      "icms": { "cst": "00", "aliquotaInterna": "18.00", "aliquotaInterestadual": "18.00", "fcp": "2.00" },
+      "pisCofins": { "regime": "cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "0.65", "aliquotaCofins": "3.00" }
+    }
+  },
+  "esperado": {
+    "icms": { "bc": "1000.00", "aliquota": "18.00", "valor": "180.00" },
+    "ipi": { "bc": "1000.00", "aliquota": "0.00", "valor": "0.00" },
+    "pis": { "bc": "1000.00", "aliquota": "0.65", "valor": "6.50" },
+    "cofins": { "bc": "1000.00", "aliquota": "3.00", "valor": "30.00" },
+    "fcp": { "bc": "1000.00", "aliquota": "2.00", "valor": "20.00" },
+    "totalTributos": "236.50"
+  }
+}

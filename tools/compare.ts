@@ -61,6 +61,12 @@ function achatarResultado(resultado: any | undefined): Campo[] {
       { rotulo: 'icmsSt.mvaAplicada', valor: resultado.icmsSt.mvaAplicada },
     );
   }
+  if (resultado.icmsDesonerado) {
+    campos.push({ rotulo: 'icmsDesonerado', valor: resultado.icmsDesonerado });
+  }
+  if (resultado.fcp) {
+    campos.push(...achatarTributoBase('fcp', resultado.fcp));
+  }
   if (resultado.difal) {
     campos.push(
       { rotulo: 'difal.valorOrigem', valor: resultado.difal.valorOrigem },

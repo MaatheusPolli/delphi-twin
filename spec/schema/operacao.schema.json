@@ -28,7 +28,8 @@
           "properties": {
             "aliquota": { "$ref": "#/definitions/decimal" },
             "cst": { "type": "string" },
-            "incluirNaBaseIcms": { "type": "boolean" }
+            "incluirNaBaseIcms": { "type": "boolean" },
+            "reducaoAliquota": { "$ref": "#/definitions/decimal", "description": "Percentual de reducao sobre a aliquota (RIPI art. 190 e seguintes). Aliquota efetiva = aliquota x (100 - reducao) / 100." }
           }
         },
         "icms": {
@@ -42,7 +43,8 @@
             "reducaoBC": { "$ref": "#/definitions/decimal" },
             "mva": { "$ref": "#/definitions/decimal" },
             "reducaoBCST": { "$ref": "#/definitions/decimal" },
-            "fcp": { "$ref": "#/definitions/decimal" }
+            "fcp": { "$ref": "#/definitions/decimal" },
+            "desonerado": { "type": "boolean" }
           }
         },
         "pisCofins": {

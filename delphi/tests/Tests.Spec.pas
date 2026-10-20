@@ -84,6 +84,18 @@ begin
       DiferencaDeCurrency('icmsSt.valor', AEsperado.IcmsSt.Valor, AObtido.IcmsSt.Valor) +
       DiferencaDeCurrency('icmsSt.mvaAplicada', AEsperado.IcmsSt.MvaAplicada, AObtido.IcmsSt.MvaAplicada);
 
+  if AEsperado.TemIcmsDesonerado then
+    Result := Result + DiferencaDeCurrency('icmsDesonerado', AEsperado.IcmsDesonerado, AObtido.IcmsDesonerado);
+
+  if AEsperado.TemFcp <> AObtido.TemFcp then
+    Result := Result + Format('fcp: esperado presente=%s obtido presente=%s; ',
+      [BoolToStr(AEsperado.TemFcp, True), BoolToStr(AObtido.TemFcp, True)])
+  else if AEsperado.TemFcp then
+    Result := Result +
+      DiferencaDeCurrency('fcp.bc', AEsperado.Fcp.Bc, AObtido.Fcp.Bc) +
+      DiferencaDeCurrency('fcp.aliquota', AEsperado.Fcp.Aliquota, AObtido.Fcp.Aliquota) +
+      DiferencaDeCurrency('fcp.valor', AEsperado.Fcp.Valor, AObtido.Fcp.Valor);
+
   if AEsperado.TemDifal <> AObtido.TemDifal then
     Result := Result + Format('difal: esperado presente=%s obtido presente=%s; ',
       [BoolToStr(AEsperado.TemDifal, True), BoolToStr(AObtido.TemDifal, True)])

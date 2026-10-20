@@ -69,6 +69,7 @@ begin
     Result.IncluirNaBaseIcms := (Flag as TJSONBool).AsBoolean
   else
     Result.IncluirNaBaseIcms := False;
+  Result.ReducaoAliquota := StrDecimalOpcionalParaCurrency(AObjeto, 'reducaoAliquota', Result.TemReducaoAliquota);
 end;
 
 function CarregarItemIcms(const AObjeto: TJSONObject): TItemIcms;
@@ -80,6 +81,10 @@ begin
   Result.Mva := StrDecimalOpcionalParaCurrency(AObjeto, 'mva', Result.TemMva);
   Result.ReducaoBCST := StrDecimalOpcionalParaCurrency(AObjeto, 'reducaoBCST', Result.TemReducaoBCST);
   Result.Fcp := StrDecimalOpcionalParaCurrency(AObjeto, 'fcp', Result.TemFcp);
+  if AObjeto.TryGetValue<TJSONValue>('desonerado', Flag) then
+    Result.Desonerado := (Flag as TJSONBool).AsBoolean
+  else
+    Result.Desonerado := False;
 end;
 
 function CarregarItemPisCofins(const AObjeto: TJSONObject): TItemPisCofins;
@@ -131,7 +136,7 @@ end;
 
 function CarregarResultado(const AObjeto: TJSONObject): TResultadoTributos;
 var
-  IcmsStObj, DifalObj: TJSONValue;
+  IcmsStObj, DifalObj, FcpObj: TJSONValue;
 begin
   Result := Default(TResultadoTributos);
   Result.Icms := CarregarTributoBase(AObjeto.GetValue<TJSONObject>('icms'));
@@ -155,6 +160,15 @@ begin
     Result.Difal.ValorOrigem := StrDecimalParaCurrency(DifalObj as TJSONObject, 'valorOrigem');
     Result.Difal.ValorDestino := StrDecimalParaCurrency(DifalObj as TJSONObject, 'valorDestino');
     Result.Difal.Fcp := StrDecimalParaCurrency(DifalObj as TJSONObject, 'fcp');
+  end;
+
+  Result.IcmsDesonerado := StrDecimalOpcionalParaCurrency(AObjeto, 'icmsDesonerado', Result.TemIcmsDesonerado);
+  Result.TemFcp := AObjeto.TryGetValue<TJSONValue>('fcp', FcpObj);
+  if Result.TemFcp then
+  begin
+    Result.Fcp.Bc := StrDecimalParaCurrency(FcpObj as TJSONObject, 'bc');
+    Result.Fcp.Aliquota := StrDecimalParaCurrency(FcpObj as TJSONObject, 'aliquota');
+    Result.Fcp.Valor := StrDecimalParaCurrency(FcpObj as TJSONObject, 'valor');
   end;
 end;
 
@@ -238,7 +252,7 @@ end;
 
 function ResultadoParaJson(const AResultado: TResultadoTributos): TJSONObject;
 var
-  IcmsStObj, DifalObj: TJSONObject;
+  IcmsStObj, DifalObj, FcpObj: TJSONObject;
 begin
   Result := TJSONObject.Create;
   Result.AddPair('icms', TributoBaseParaJson(AResultado.Icms));
@@ -257,6 +271,9 @@ begin
     Result.AddPair('icmsSt', IcmsStObj);
   end;
 
+  if AResultado.TemIcmsDesonerado then
+    Result.AddPair('icmsDesonerado', CurrencyParaStrDecimal(AResultado.IcmsDesonerado));
+
   if AResultado.TemDifal then
   begin
     DifalObj := TJSONObject.Create;
@@ -264,6 +281,15 @@ begin
     DifalObj.AddPair('valorDestino', CurrencyParaStrDecimal(AResultado.Difal.ValorDestino));
     DifalObj.AddPair('fcp', CurrencyParaStrDecimal(AResultado.Difal.Fcp));
     Result.AddPair('difal', DifalObj);
+  end;
+
+  if AResultado.TemFcp then
+  begin
+    FcpObj := TJSONObject.Create;
+    FcpObj.AddPair('bc', CurrencyParaStrDecimal(AResultado.Fcp.Bc));
+    FcpObj.AddPair('aliquota', CurrencyParaStrDecimal(AResultado.Fcp.Aliquota));
+    FcpObj.AddPair('valor', CurrencyParaStrDecimal(AResultado.Fcp.Valor));
+    Result.AddPair('fcp', FcpObj);
   end;
 end;
 

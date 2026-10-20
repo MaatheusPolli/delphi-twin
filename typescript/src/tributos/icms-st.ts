@@ -86,7 +86,8 @@ export function calcularIcmsSt(
   const aliquota = item.icms.aliquotaInterna;
 
   let valor = roundHalfEven2(aplicarPercentual(bc, aliquota)).minus(valorIcmsProprio);
-  if (valor.isNegative()) {
+  if (valor.isNegative() || item.icms.cst === '60') {
+    // CST 60: o ICMS-ST ja foi retido na operacao anterior, nada e devido aqui.
     valor = d(0);
   }
 

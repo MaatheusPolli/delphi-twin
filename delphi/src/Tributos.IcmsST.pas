@@ -99,7 +99,7 @@ begin
   Result.MvaAplicada := MvaAplicada;
 
   ValorST := RoundHalfEven2(AplicarPercentual(Result.Bc, Result.Aliquota)) - AValorIcmsProprio;
-  if ValorST < 0 then
+  if (ValorST < 0) or (AOperacao.Item.Icms.Cst = '60') then
     ValorST := 0;
   Result.Valor := ValorST;
 end;

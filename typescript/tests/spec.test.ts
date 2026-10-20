@@ -2,6 +2,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { Decimal } from 'decimal.js';
+import { d } from '../src/domain/decimal.js';
 import { carregarCasoDeArquivo, listarArquivosDeCasos } from '../src/spec-loader.js';
 import { calcularTributos } from '../src/tributos/motor.js';
 import type { ResultadoTributos, TributoBase } from '../src/domain/types.js';
@@ -37,6 +38,13 @@ function expectResultadoIgual(esperado: ResultadoTributos, obtido: ResultadoTrib
   if (esperado.icmsSt && obtido.icmsSt) {
     expectTributoBase('icmsSt', esperado.icmsSt, obtido.icmsSt);
     expectDecimalIgual('icmsSt.mvaAplicada', esperado.icmsSt.mvaAplicada, obtido.icmsSt.mvaAplicada);
+  }
+
+  expectDecimalIgual('icmsDesonerado', esperado.icmsDesonerado ?? d(0), obtido.icmsDesonerado ?? d(0));
+
+  expect(!!obtido.fcp, 'presenca de fcp').toBe(!!esperado.fcp);
+  if (esperado.fcp && obtido.fcp) {
+    expectTributoBase('fcp', esperado.fcp, obtido.fcp);
   }
 
   expect(!!obtido.difal, 'presenca de difal').toBe(!!esperado.difal);

@@ -1,0 +1,28 @@
+{
+  "id": "ipi-reducao",
+  "descricao": "Venda interna SP->SP com IPI de 10% reduzido em 50% (aliquota efetiva de 5%), ICMS de 18% sem reducao.",
+  "entrada": {
+    "ufOrigem": "SP",
+    "ufDestino": "SP",
+    "destinatarioContribuinte": true,
+    "regimeEmitente": "normal",
+    "item": {
+      "valorProduto": "1000.00",
+      "quantidade": "1",
+      "frete": "0.00",
+      "seguro": "0.00",
+      "desconto": "0.00",
+      "outras": "0.00",
+      "ipi": { "aliquota": "10.00", "cst": "50", "incluirNaBaseIcms": false, "reducaoAliquota": "50.00" },
+      "icms": { "cst": "00", "aliquotaInterna": "18.00", "aliquotaInterestadual": "18.00" },
+      "pisCofins": { "regime": "cumulativo", "cstPis": "01", "cstCofins": "01", "aliquotaPis": "0.65", "aliquotaCofins": "3.00" }
+    }
+  },
+  "esperado": {
+    "icms": { "bc": "1000.00", "aliquota": "18.00", "valor": "180.00" },
+    "ipi": { "bc": "1000.00", "aliquota": "5.00", "valor": "50.00" },
+    "pis": { "bc": "1000.00", "aliquota": "0.65", "valor": "6.50" },
+    "cofins": { "bc": "1000.00", "aliquota": "3.00", "valor": "30.00" },
+    "totalTributos": "266.50"
+  }
+}

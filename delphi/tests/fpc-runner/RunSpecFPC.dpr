@@ -25,6 +25,7 @@ uses
   Tributos.Ipi in '..\..\src\Tributos.Ipi.pas',
   Tributos.PisCofins in '..\..\src\Tributos.PisCofins.pas',
   Tributos.Difal in '..\..\src\Tributos.Difal.pas',
+  Tributos.Fcp in '..\..\src\Tributos.Fcp.pas',
   Tributos.Motor in '..\..\src\Tributos.Motor.pas';
 
 var
@@ -95,6 +96,14 @@ begin
       '  }';
   end;
 
+  if AResultado.TemFcp then
+  begin
+    Result := Result + ',' + sLineBreak + '  "fcp": {' + sLineBreak + TributoBaseParaJson(AResultado.Fcp.Bc, AResultado.Fcp.Aliquota, AResultado.Fcp.Valor);
+  end;
+
+  if AResultado.TemIcmsDesonerado then
+    Result := Result + ',' + sLineBreak + '  "icmsDesonerado": "' + CurrToStrInvariante(AResultado.IcmsDesonerado) + '"';
+
   if AResultado.TemDifal then
   begin
     Result := Result + ',' + sLineBreak + '  "difal": {' + sLineBreak +
@@ -152,6 +161,23 @@ begin
       Checar(AId, 'icmsSt.bc', AEsperado.IcmsSt.Bc, Obtido.IcmsSt.Bc);
       Checar(AId, 'icmsSt.valor', AEsperado.IcmsSt.Valor, Obtido.IcmsSt.Valor);
       Checar(AId, 'icmsSt.mvaAplicada', AEsperado.IcmsSt.MvaAplicada, Obtido.IcmsSt.MvaAplicada);
+    end;
+  end;
+
+  if AEsperado.TemIcmsDesonerado then
+    Checar(AId, 'icmsDesonerado', AEsperado.IcmsDesonerado, Obtido.IcmsDesonerado);
+
+  if AEsperado.TemFcp then
+  begin
+    if not Obtido.TemFcp then
+    begin
+      Inc(TotalFalha);
+      Writeln(Format('FALHA [%s] fcp: esperado presente, obtido ausente', [AId]));
+    end
+    else
+    begin
+      Checar(AId, 'fcp.bc', AEsperado.Fcp.Bc, Obtido.Fcp.Bc);
+      Checar(AId, 'fcp.valor', AEsperado.Fcp.Valor, Obtido.Fcp.Valor);
     end;
   end;
 
@@ -278,6 +304,123 @@ begin
   Esp.Difal.ValorDestino := 88; Esp.Difal.Fcp := 0;
   Esp.TotalTributos := 356.50;
   RodarCaso('ipi-na-base-icms', Op, Esp);
+end;
+
+{ ---- caso 7: fcp-interno-sp ---- }
+procedure TesteFcpInterno;
+var
+  Op: TOperacaoFiscal;
+  Esp: TResultadoTributos;
+begin
+  Op := OperacaoBase;
+  Op.Item.Icms.AliquotaInterna := 18;
+  Op.Item.Icms.AliquotaInterestadual := 18;
+  Op.Item.Icms.TemFcp := True;
+  Op.Item.Icms.Fcp := 2;
+
+  Esp := Default(TResultadoTributos);
+  Esp.Icms.Bc := 1000; Esp.Icms.Aliquota := 18; Esp.Icms.Valor := 180;
+  Esp.Ipi.Bc := 1000; Esp.Ipi.Valor := 0;
+  Esp.Pis.Valor := 6.50;
+  Esp.Cofins.Valor := 30;
+  Esp.TemFcp := True;
+  Esp.Fcp.Bc := 1000; Esp.Fcp.Aliquota := 2; Esp.Fcp.Valor := 20;
+  Esp.TotalTributos := 236.50;
+  RodarCaso('fcp-interno-sp', Op, Esp);
+end;
+
+{ ---- caso 8: icms-desonerado-sp ---- }
+procedure TesteIcmsDesonerado;
+var
+  Op: TOperacaoFiscal;
+  Esp: TResultadoTributos;
+begin
+  Op := OperacaoBase;
+  Op.Item.Icms.AliquotaInterna := 18;
+  Op.Item.Icms.AliquotaInterestadual := 18;
+  Op.Item.Icms.Desonerado := True;
+
+  Esp := Default(TResultadoTributos);
+  Esp.Icms.Bc := 1000; Esp.Icms.Aliquota := 18; Esp.Icms.Valor := 0;
+  Esp.Ipi.Bc := 1000; Esp.Ipi.Valor := 0;
+  Esp.Pis.Valor := 6.50;
+  Esp.Cofins.Valor := 30;
+  Esp.TemIcmsDesonerado := True;
+  Esp.IcmsDesonerado := 180;
+  Esp.TotalTributos := 36.50;
+  RodarCaso('icms-desonerado-sp', Op, Esp);
+end;
+
+{ ---- caso 9: cst-30-st-interna e cst-60-st-retido ---- }
+procedure TesteCstStInterna(const AId, ACst: string; const AIcmsValor, AStValor: Currency; const ATotal: Currency);
+var
+  Op: TOperacaoFiscal;
+  Esp: TResultadoTributos;
+begin
+  Op := OperacaoBase;
+  Op.Item.Icms.Cst := ACst;
+  Op.Item.Icms.AliquotaInterna := 18;
+  Op.Item.Icms.AliquotaInterestadual := 18;
+  Op.Item.Icms.TemMva := True;
+  Op.Item.Icms.Mva := 40;
+
+  Esp := Default(TResultadoTributos);
+  Esp.Icms.Bc := 1000; Esp.Icms.Aliquota := 18; Esp.Icms.Valor := AIcmsValor;
+  Esp.Ipi.Bc := 1000; Esp.Ipi.Valor := 0;
+  Esp.Pis.Valor := 6.50;
+  Esp.Cofins.Valor := 30;
+  Esp.TemIcmsSt := True;
+  Esp.IcmsSt.Bc := 1400; Esp.IcmsSt.Aliquota := 18; Esp.IcmsSt.Valor := AStValor; Esp.IcmsSt.MvaAplicada := 40;
+  Esp.TotalTributos := ATotal;
+  RodarCaso(AId, Op, Esp);
+end;
+
+{ ---- caso 10: cst-70-reducao-st ---- }
+procedure TesteCst70ReducaoSt;
+var
+  Op: TOperacaoFiscal;
+  Esp: TResultadoTributos;
+begin
+  Op := OperacaoBase;
+  Op.Item.Icms.Cst := '70';
+  Op.Item.Icms.AliquotaInterna := 18;
+  Op.Item.Icms.AliquotaInterestadual := 18;
+  Op.Item.Icms.TemReducaoBC := True;
+  Op.Item.Icms.ReducaoBC := 33.33;
+  Op.Item.Icms.TemMva := True;
+  Op.Item.Icms.Mva := 40;
+
+  Esp := Default(TResultadoTributos);
+  Esp.Icms.Bc := 666.70; Esp.Icms.Aliquota := 18; Esp.Icms.Valor := 120.01;
+  Esp.Ipi.Bc := 1000; Esp.Ipi.Valor := 0;
+  Esp.Pis.Valor := 6.50;
+  Esp.Cofins.Valor := 30;
+  Esp.TemIcmsSt := True;
+  Esp.IcmsSt.Bc := 1400; Esp.IcmsSt.Aliquota := 18; Esp.IcmsSt.Valor := 131.99; Esp.IcmsSt.MvaAplicada := 40;
+  Esp.TotalTributos := 288.50;
+  RodarCaso('cst-70-reducao-st', Op, Esp);
+end;
+
+{ ---- caso 11: ipi-reducao ---- }
+procedure TesteIpiReducao;
+var
+  Op: TOperacaoFiscal;
+  Esp: TResultadoTributos;
+begin
+  Op := OperacaoBase;
+  Op.Item.Ipi.Aliquota := 10;
+  Op.Item.Ipi.TemReducaoAliquota := True;
+  Op.Item.Ipi.ReducaoAliquota := 50;
+  Op.Item.Icms.AliquotaInterna := 18;
+  Op.Item.Icms.AliquotaInterestadual := 18;
+
+  Esp := Default(TResultadoTributos);
+  Esp.Icms.Bc := 1000; Esp.Icms.Aliquota := 18; Esp.Icms.Valor := 180;
+  Esp.Ipi.Bc := 1000; Esp.Ipi.Aliquota := 5; Esp.Ipi.Valor := 50;
+  Esp.Pis.Valor := 6.50;
+  Esp.Cofins.Valor := 30;
+  Esp.TotalTributos := 266.50;
+  RodarCaso('ipi-reducao', Op, Esp);
 end;
 
 { ---- caso 6: difal-nao-contribuinte ---- }
@@ -455,6 +598,13 @@ begin
   TesteIcmsStMvaAjustada;
   TesteIpiNaBaseIcms;
   TesteDifalNaoContribuinte;
+  TesteFcpInterno;
+  TesteIcmsDesonerado;
+  TesteCstStInterna('cst-30-st-interna', '30', 0, 252, 288.50);
+  TesteCstStInterna('cst-60-st-retido', '60', 0, 0, 36.50);
+  TesteCstStInterna('cst-10-st-interna', '10', 180, 72, 288.50);
+  TesteCst70ReducaoSt;
+  TesteIpiReducao;
   TestePisCofinsCumulativo;
   TestePisCofinsNaoCumulativo;
   TesteArredondamentoLimite;

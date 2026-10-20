@@ -41,8 +41,11 @@ begin
   Base := Item.ValorProduto - Item.Desconto + Item.Frete + Item.Seguro + Item.Outras;
 
   Result.Bc := RoundHalfEven2(Base);
-  Result.Aliquota := Item.Ipi.Aliquota;
-  Result.Valor := RoundHalfEven2(AplicarPercentual(Result.Bc, Item.Ipi.Aliquota));
+  if Item.Ipi.TemReducaoAliquota then
+    Result.Aliquota := AplicarPercentual(Item.Ipi.Aliquota, 100 - Item.Ipi.ReducaoAliquota)
+  else
+    Result.Aliquota := Item.Ipi.Aliquota;
+  Result.Valor := RoundHalfEven2(AplicarPercentual(Result.Bc, Result.Aliquota));
 end;
 
 end.

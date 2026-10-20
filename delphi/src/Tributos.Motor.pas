@@ -13,6 +13,8 @@ unit Tributos.Motor;
     4. PIS/COFINS- independente.
     5. DIFAL     - so quando aplicavel (interestadual + nao contribuinte);
                    usa a mesma base do ICMS proprio.
+    6. FCP       - so em operacao interna com aliquota de FCP informada;
+                   usa a mesma base do ICMS proprio.
 }
 
 interface
@@ -23,7 +25,8 @@ uses
   Tributos.IcmsST,
   Tributos.Ipi,
   Tributos.PisCofins,
-  Tributos.Difal;
+  Tributos.Difal,
+  Tributos.Fcp;
 
 type
   IMotorTributario = interface
@@ -99,11 +102,21 @@ begin
     Result.Difal := FCalculadoraDifal.Calcular(AOperacao, BaseDifal);
   end;
 
+  Result.TemIcmsDesonerado := AOperacao.Item.Icms.Desonerado;
+  if Result.TemIcmsDesonerado then
+    Result.IcmsDesonerado := CalcularIcmsDesonerado(Result.Icms);
+
+  Result.TemFcp := FcpAplicavel(AOperacao);
+  if Result.TemFcp then
+    Result.Fcp := CalcularFcp(AOperacao, Result.Icms.Bc);
+
   Result.TotalTributos := Result.Icms.Valor + Result.Ipi.Valor + Result.Pis.Valor + Result.Cofins.Valor;
   if Result.TemIcmsSt then
     Result.TotalTributos := Result.TotalTributos + Result.IcmsSt.Valor;
   if Result.TemDifal then
     Result.TotalTributos := Result.TotalTributos + Result.Difal.ValorOrigem + Result.Difal.ValorDestino + Result.Difal.Fcp;
+  if Result.TemFcp then
+    Result.TotalTributos := Result.TotalTributos + Result.Fcp.Valor;
 end;
 
 end.

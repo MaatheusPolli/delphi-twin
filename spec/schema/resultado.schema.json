@@ -31,6 +31,17 @@
         "fcp": { "$ref": "#/definitions/decimal" }
       }
     },
+    "fcp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bc", "aliquota", "valor"],
+      "properties": {
+        "bc": { "$ref": "#/definitions/decimal" },
+        "aliquota": { "$ref": "#/definitions/decimal" },
+        "valor": { "$ref": "#/definitions/decimal" }
+      }
+    },
+    "icmsDesonerado": { "$ref": "#/definitions/decimal" },
     "totalTributos": { "$ref": "#/definitions/decimal" }
   },
   "definitions": {
